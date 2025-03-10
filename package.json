@@ -35,7 +35,8 @@
   "files": [
     "./bin",
     "./dist",
-    "./oclif.manifest.json"
+    "./oclif.manifest.json",
+    "./mcp-servers.json"
   ],
   "homepage": "https://github.com/mcpgod/cli",
   "keywords": [
