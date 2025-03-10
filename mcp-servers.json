@@ -1,0 +1,207 @@
+[
+    {
+      "name": "@modelcontextprotocol/server-brave-search",
+      "description": "MCP server for Brave Search API integration",
+      "runtime": "node"
+    },
+    {
+      "name": "@modelcontextprotocol/server-everything",
+      "description": "MCP server that exercises all the features of the MCP protocol",
+      "runtime": "node"
+    },
+    {
+      "name": "@modelcontextprotocol/server-filesystem",
+      "description": "MCP server for filesystem access",
+      "runtime": "node"
+    },
+    {
+      "name": "@modelcontextprotocol/server-gdrive",
+      "description": "MCP server for interacting with Google Drive",
+      "runtime": "node"
+    },
+    {
+      "name": "@modelcontextprotocol/server-github",
+      "description": "MCP server for using the GitHub API",
+      "runtime": "node"
+    },
+    {
+      "name": "@modelcontextprotocol/server-gitlab",
+      "description": "MCP server for using the GitLab API",
+      "runtime": "node"
+    },
+    {
+      "name": "@modelcontextprotocol/server-google-maps",
+      "description": "MCP server for using the Google Maps API",
+      "runtime": "node"
+    },
+    {
+      "name": "@modelcontextprotocol/server-memory",
+      "description": "MCP server for enabling memory for Claude through a knowledge graph",
+      "runtime": "node"
+    },
+    {
+      "name": "@modelcontextprotocol/server-postgres",
+      "description": "MCP server for interacting with PostgreSQL databases",
+      "runtime": "node"
+    },
+    {
+      "name": "@modelcontextprotocol/server-puppeteer",
+      "description": "MCP server for browser automation using Puppeteer",
+      "runtime": "node"
+    },
+    {
+      "name": "@modelcontextprotocol/server-slack",
+      "description": "MCP server for interacting with Slack",
+      "runtime": "node"
+    },
+    {
+      "name": "@cloudflare/mcp-server-cloudflare",
+      "description": "MCP server for interacting with Cloudflare API",
+      "runtime": "node"
+    },
+    {
+      "name": "@raygun.io/mcp-server-raygun",
+      "description": "MCP server for interacting with Raygun's API for crash reporting and real user monitoring metrics",
+      "runtime": "node"
+    },
+    {
+      "name": "@kimtaeyoon83/mcp-server-youtube-transcript",
+      "description": "This is an MCP server that allows you to directly download transcripts of YouTube videos.",
+      "runtime": "node"
+    },
+    {
+      "name": "@kagi/mcp-server-kagi",
+      "description": "MCP server for Kagi search API integration",
+      "runtime": "node"
+    },
+    {
+      "name": "@exa/mcp-server",
+      "description": "MCP server for Exa AI Search API integration",
+      "runtime": "node"
+    },
+    {
+      "name": "@search1api/mcp-server",
+      "description": "MCP server for Search1API integration",
+      "runtime": "node"
+    },
+    {
+      "name": "@calclavia/mcp-obsidian",
+      "description": "MCP server for reading and searching Markdown notes (like Obsidian vaults)",
+      "runtime": "node"
+    },
+    {
+      "name": "@anaisbetts/mcp-youtube",
+      "description": "MCP server for fetching YouTube subtitles",
+      "runtime": "node"
+    },
+    {
+      "name": "@modelcontextprotocol/server-everart",
+      "description": "MCP server for EverArt API integration",
+      "runtime": "node"
+    },
+    {
+      "name": "@modelcontextprotocol/server-sequential-thinking",
+      "description": "MCP server for sequential thinking and problem solving",
+      "runtime": "node"
+    },
+    {
+      "name": "@automatalabs/mcp-server-playwright",
+      "description": "MCP server for browser automation using Playwright",
+      "runtime": "node"
+    },
+    {
+      "name": "@mcp-get-community/server-llm-txt",
+      "description": "MCP server that extracts and serves context from llm.txt files, enabling AI models to understand file structure, dependencies, and code relationships in development environments",
+      "runtime": "node"
+    },
+    {
+      "name": "@executeautomation/playwright-mcp-server",
+      "description": "A Model Context Protocol server for Playwright for Browser Automation and Web Scraping.",
+      "runtime": "node"
+    },
+    {
+      "name": "@mcp-get-community/server-curl",
+      "description": "MCP server for making HTTP requests using a curl-like interface",
+      "runtime": "node"
+    },
+    {
+      "name": "@mcp-get-community/server-macos",
+      "description": "MCP server for macOS system operations",
+      "runtime": "node"
+    },
+    {
+      "name": "@modelcontextprotocol/server-aws-kb-retrieval",
+      "description": "MCP server for AWS Knowledge Base retrieval using Bedrock Agent Runtime",
+      "runtime": "node"
+    },
+    {
+      "name": "mcp-mongo-server",
+      "description": "A Model Context Protocol Server for MongoDB",
+      "runtime": "node"
+    },
+    {
+      "name": "@llmindset/mcp-hfspace",
+      "description": "MCP Server for using HuggingFace Spaces. Seamlessly use the latest Open Source Image, Audio and Text Models from within Claude Deskop.",
+      "runtime": "node"
+    },
+    {
+      "name": "@llmindset/mcp-miro",
+      "description": "A Model Context Protocol server to connect to the MIRO Whiteboard Application",
+      "runtime": "node"
+    },
+    {
+      "name": "@strowk/mcp-k8s",
+      "description": "MCP server connecting to Kubernetes",
+      "runtime": "node"
+    },
+    {
+      "name": "mcp-shell",
+      "description": "An MCP server for your shell",
+      "runtime": "node"
+    },
+    {
+      "name": "@benborla29/mcp-server-mysql",
+      "description": "An MCP server for interacting with MySQL databases",
+      "runtime": "node"
+    },
+    {
+      "name": "airtable-mcp-server",
+      "description": "Airtable database integration with schema inspection, read and write capabilities",
+      "runtime": "node"
+    },
+    {
+      "name": "@enescinar/twitter-mcp",
+      "description": "This MCP server allows Clients to interact with Twitter, enabling posting tweets and searching Twitter.",
+      "runtime": "node"
+    },
+    {
+      "name": "mcp-server-commands",
+      "description": "MCP server enabling LLMs to execute shell commands and run scripts through various interpreters with built-in safety controls.",
+      "runtime": "node"
+    },
+    {
+      "name": "mcp-server-kubernetes",
+      "description": "MCP server for managing Kubernetes clusters, enabling LLMs to interact with and control Kubernetes resources.",
+      "runtime": "node"
+    },
+    {
+      "name": "@chanmeng666/google-news-server",
+      "description": "MCP server for Google News search via SerpAPI",
+      "runtime": "node"
+    },
+    {
+      "name": "mcp-server-stability-ai",
+      "description": "Integrates Stability AI's image generation and manipulation capabilities for editing, upscaling, and more via Stable Diffusion models.",
+      "runtime": "node"
+    },
+    {
+      "name": "@modelcontextprotocol/server-redis",
+      "description": "",
+      "runtime": "node"
+    },
+    {
+      "name": "kubernetes-mcp-server",
+      "description": "Powerful and flexible Kubernetes MCP server implementation with additional features for OpenShift. Besides the typical CRUD operations on any Kubernetes resource, this implementation adds specialized features for Pods and other resources.",
+      "runtime": "node"
+    }
+]

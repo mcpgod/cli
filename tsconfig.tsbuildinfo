@@ -1,0 +1,1 @@
+{"root":["./src/index.ts","./src/commands/add.ts","./src/commands/clients.ts","./src/commands/list.ts","./src/commands/remove.ts","./src/commands/run.ts","./src/commands/servers.ts","./src/commands/tool.ts","./src/commands/tools.ts"],"version":"5.8.2"}
