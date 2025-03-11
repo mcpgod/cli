@@ -6,17 +6,27 @@ export default class Add extends Command {
   static description = 'Add a server to a client'
 
   static flags = {
-    client: Flags.string({char: 'c', description: 'client name', required: true}),
+    client: Flags.string({char: 'c', description: 'Client name to add the server to', required: true}),
+    tools: Flags.string({
+      char: 't',
+      description: 'Comma separated list of approved tools'
+    })
   }
 
   static args = {
-    mcpServer: Args.string({description: 'MCP server to install', required: true}),
+    server: Args.string({description: 'The mcp server to add', required: true}),
   }
   
   async run() {
     const {args, flags} = await this.parse(Add)
-    const mcpServer = args.mcpServer
+    const server = args.server
     const client = flags.client
+
+    var approvedTools = '';
+
+    if (flags.tools) {
+      approvedTools += '--tools ' + flags.tools
+    }
 
     // Determine the configuration file path based on the OS
     const configFilePath = process.platform === 'win32' 
@@ -38,26 +48,27 @@ export default class Add extends Command {
     }
 
     // Check if the server already exists
-    if (config.mcpServers[mcpServer]) {
-      this.log(`Server ${mcpServer} already exists in the configuration for client ${client}`)
+    if (config.mcpServers[server]) {
+      this.log(`Server ${server} already exists in the configuration for client ${client}`)
       return
     }
 
     // Add the new mcp-server
-    config.mcpServers[mcpServer] = {
+    config.mcpServers[server] = {
       command: 'npx',
       args: [
         "-y",
-        "@mcpgod/cli",
+        "mcpgod",
         "run",
-        mcpServer
+        server,
+        approvedTools
       ]
     }
 
     // Write the updated configuration back to the file
     try {
       fs.writeFileSync(configFilePath, JSON.stringify(config, null, 2))
-      this.log(`Successfully added ${mcpServer} to the configuration for client ${client}`)
+      this.log(`Successfully added ${server} to the configuration for client ${client}`)
     } catch (error: unknown) {
       if (error instanceof Error) {
         this.error(`Failed to write to configuration file: ${error.message}`)

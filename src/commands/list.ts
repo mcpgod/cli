@@ -1,6 +1,16 @@
 import {Command, Flags, Args} from '@oclif/core'
 import * as fs from 'fs'
 import * as path from 'path'
+import {stdout, colorize} from '@oclif/core/ux'
+
+interface ServerDetails {
+  command: string;
+  args: string[];
+}
+
+interface Config {
+  mcpServers?: Record<string, ServerDetails>;
+}
 
 export default class List extends Command {
   static description = 'List all the servers for a client'
@@ -31,7 +41,7 @@ export default class List extends Command {
     }
 
     // Load the configuration file
-    let config
+    let config: Config
     try {
       const configFile = fs.readFileSync(configFilePath, 'utf-8')
       config = JSON.parse(configFile)
@@ -50,8 +60,10 @@ export default class List extends Command {
       this.log(`No servers found for client ${client}`)
     } else {
       for (const [serverName, serverDetails] of Object.entries(servers)) {
-        this.log(`${serverName}`)
+        const commandString = `${serverDetails.command} ${serverDetails.args.join(' ')}`;
+
+        stdout(colorize('magenta', serverName) + `: ${commandString}`);
       }
     }
   }
-} 
+}

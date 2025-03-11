@@ -1,4 +1,4 @@
-import { Command } from '@oclif/core'
+import { Command, Flags } from '@oclif/core'
 import * as fs from 'fs'
 import * as path from 'path'
 import { spawn, ChildProcessWithoutNullStreams } from 'child_process'
@@ -18,13 +18,23 @@ export default class Run extends Command {
   ]
   static strict = false // Allow variable arguments
 
+  static flags = {
+    tools: Flags.string({
+      char: 't',
+      description: 'Comma separated list of approved tools',
+      default: ''
+    })
+  };
+
   async run(): Promise<void> {
-    const { argv } = await this.parse(Run)
+    const { argv, flags } = await this.parse(Run)
     if (argv.length === 0) {
       this.error('Please specify a package to run')
     }
     // Assert that argv is a string array.
     const stringArgs = argv as string[]
+
+    const approvedTools = flags.tools.split(',').map(tool => tool.trim());
 
     // Determine home directory for cross-platform compatibility.
     const homeDir = process.env.HOME || process.env.USERPROFILE;
@@ -32,15 +42,21 @@ export default class Run extends Command {
       throw new Error('Unable to determine home directory.');
     }
 
-    // Set the static log directory path: $HOME/god/logs
+    // Set the static log directory path: $HOME/mcpgod/logs
     const logsDir = path.join(homeDir, 'mcpgod', 'logs');
     if (!fs.existsSync(logsDir)) {
       fs.mkdirSync(logsDir, { recursive: true }); // Ensure nested directories are created.
     }
 
+    function sanitizeFilename(str: string): string {
+      // Replace invalid characters with an underscore
+      return str.replace(/[\/\\?%*:|"<>]/g, '_');
+    }
+
     // Create log file with timestamp.
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-')
-    const logFile = path.join(logsDir, `npx-run-${timestamp}.log`)
+    const filename = sanitizeFilename(`run--${stringArgs.join(' ')}--${timestamp}.log`);
+    const logFile = path.join(logsDir, filename)
 
     // Setup Winston logger.
     const logger = winston.createLogger({
@@ -54,7 +70,8 @@ export default class Run extends Command {
       transports: [new winston.transports.File({ filename: logFile })]
     })
 
-    logger.info(`Command: npx -y ${stringArgs.join(' ')}`)
+    logger.info('')
+    logger.info(`Command: ${stringArgs.join(' ')}`)
     logger.info(`Started at: ${new Date().toISOString()}`)
     logger.info('')
 
@@ -66,41 +83,24 @@ export default class Run extends Command {
     filteredEnv.TERM = filteredEnv.TERM || 'xterm-color'
 
     function handleOutput(data: string, stream: NodeJS.WritableStream) {
-      const approvedTools = ["echo", "add"];
-
-      //const trimmedData = data.trim();
-
-      // Only attempt JSON parsing if the data appears to be a JSON object
-      //if (trimmedData.startsWith("{") && trimmedData.endsWith("}")) {
-        try {
-          //const parsed = JSON.parse(trimmedData);
-          const parsed = JSON.parse(data);
-
-          // Check if parsed JSON has the expected result.tools structure before filtering
-          if (parsed && parsed.result && Array.isArray(parsed.result.tools)) {
-            parsed.result.tools = parsed.result.tools.filter(
-              (tool: { name: string }) => approvedTools.includes(tool.name)
-            );
-
-            const jsonString = JSON.stringify(parsed);
-
-            // apparently claude desktop expects a newline at the end.
-            data = jsonString + "\n";
-          }
-        } catch (error) {
-          // If JSON parsing fails, fall back to treating the data as plain text.
+      try {
+        const parsed = JSON.parse(data);
+        // Check if parsed JSON has the expected result.tools structure before filtering
+        if (parsed && parsed.result && Array.isArray(parsed.result.tools)) {
+          parsed.result.tools = parsed.result.tools.filter(
+            (tool: { name: string }) => approvedTools.includes(tool.name)
+          );
+          const jsonString = JSON.stringify(parsed);
+          // Apparently claude desktop expects a newline at the end.
+          data = jsonString + "\n";
         }
-      //}
-
+      } catch (error) {
+        // If JSON parsing fails, fall back to treating the data as plain text.
+      }
       stream.write(data);
       const cleaned = removeControlChars(stripAnsi(data));
       logger.info(cleaned);
     }
-    
-    
-    
-    
-    
 
     // Helper to forward stdin to the child process.
     // writeFn should be a function accepting a string.
@@ -121,12 +121,17 @@ export default class Run extends Command {
       childCommand = 'npx'
     }
     const childArgs = ['-y', ...stringArgs]
+    const shell = true; //process.stdout.isTTY ? true : false;
+
+    logger.info(`Spawn: ${childCommand} ${childArgs.join(' ')}`)
+    logger.info(`Shell: ${shell}`)
+    logger.info('')
 
     const child = spawn(childCommand, childArgs, {
       cwd: process.cwd(),
       env: filteredEnv,
       stdio: ['pipe', 'pipe', 'pipe'],
-      shell: process.stdout.isTTY
+      shell: shell
     }) as ChildProcessWithoutNullStreams
 
     child.stdout.on('data', (data: Buffer) => {
