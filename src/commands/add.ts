@@ -49,7 +49,7 @@ export default class Add extends Command {
 
     // Check if the server already exists
     if (config.mcpServers[server]) {
-      this.log(`Server ${server} already exists in the configuration for client ${client}`)
+      this.log(`Server ${server} already exists in the configuration for client ${client}. Remove and add again to make a change.`)
       return
     }
 

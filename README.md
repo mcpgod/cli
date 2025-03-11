@@ -1,5 +1,5 @@
-# mcpgod
-> Manage MCP servers with ease
+# MCPGod
+> Fine-grained control over model context protocol (MCP) clients, servers, and tools. Context is God.
 
 [![oclif](https://img.shields.io/badge/cli-oclif-brightgreen.svg)](https://oclif.io)
 [![Version](https://img.shields.io/npm/v/mcpgod.svg)](https://npmjs.org/package/mcpgod)
@@ -8,26 +8,24 @@
 
 ## Overview
 
-**mcpgod** is a modern CLI tool designed to help developers manage MCP servers with speed and ease. Whether you need to add, run, list, or remove servers—or even interact with server tools—**mcpgod** provides a streamlined interface to handle all these tasks on Windows, macOS, or Linux.
+**MCPGod** is a CLI tool designed to help developers manage MCP servers with speed and ease. Whether you need to add, run, list, or remove servers—or even interact with server tools—**MCPGod** provides a streamlined interface to handle all these tasks on Windows, macOS, or Linux.
 
 ## Features
 
-- **Server Management**  
+- **Client Management**  
   Add, remove, and list MCP servers for specific clients.
-- **Run Servers**  
-  Execute and log server processes with robust cross-platform support.
-- **Tool Integration**  
-  Discover and interact with tools on your server seamlessly.
-- **Interactive & Non-Interactive Modes**  
-  Enjoy optimal experiences in both TTY and non-TTY environments.
-- **Cross-Platform Configuration**  
-  Automatically uses platform-specific paths for configuration files.
-- **Detailed Logging**  
-  Logs every server run with timestamps and clean output for easy debugging.
+- **Tool Discovery**
+  List every tool on any MCP server.
+- **Tool Calling**
+  Run any tool on any MCP server directly from the command line.
+- **Tool/Client Permissions**
+  Allow or block specific tools for specific clients.
+- **Detailed Logging**
+  Log every server run from every client, with timestamps and clean output for easy debugging.
 
 ## Installation
 
-Install **mcpgod** globally using npm:
+Install **mcpgod** globally using `npm`:
 
 ```sh
 npm install -g mcpgod
@@ -39,21 +37,35 @@ Verify the installation:
 god --version
 ```
 
+Or run directly with `npx`.
+
+```sh
+npx -y mcpgod
+```
+
 ## Usage
 
-Access the CLI with the `god` command. Below are some common examples:
+Access the CLI with the `god` command (or `npx -y mcpgod`). Below are some common examples:
 
-- **Add a Server**
+- **Add a Server to a Client**
 
-  Add an MCP server for a client (e.g., Claude):
+  Add an MCP server to a client (e.g., Claude) with `god add <SERVER> -c <CLIENT>`:
 
   ```sh
-  god add <MCP_SERVER> -c claude
+  god add @modelcontextprotocol/server-everything -c claude
+  ```
+
+- **Only Add Specific Tools to a Client**
+
+  Only add specific tools to a client with `god add <SERVER> -c <CLIENT> --tools=<COMMA_DELIMITED_LIST>`:
+
+  ```sh
+  god add @modelcontextprotocol/server-everything -c claude --tools=echo,add
   ```
 
 - **List Servers for a Client**
 
-  List all configured servers for a specific client:
+  List all configured servers for a specific client with `god list -c <CLIENT>`:
 
   ```sh
   god list -c claude
@@ -61,34 +73,34 @@ Access the CLI with the `god` command. Below are some common examples:
 
 - **Remove a Server**
 
-  Remove an MCP server from your client's configuration:
+  Remove an MCP server from your client's configuration with `god remove <SERVER> -c <CLIENT>`:
 
   ```sh
-  god remove <MCP_SERVER> -c claude
+  god remove @modelcontextprotocol/server-everything -c claude
   ```
 
 - **Run a Server**
 
-  Run a server process with detailed logging:
+  Run a server process with detailed logging with `god run <SERVER>`:
 
   ```sh
-  god run <PACKAGE_NAME> [additional arguments]
+  god run @modelcontextprotocol/server-everything
   ```
 
 - **List Available Tools for a Server**
 
-  Display the list of tools available on a server:
+  Display the list of tools available on a server with `god tools <SERVER>`:
 
   ```sh
-  god tools <SERVER>
+  god tools @modelcontextprotocol/server-everything
   ```
 
 - **Call a Specific Tool on a Server**
 
-  Interact with a tool by passing key-value properties:
+  Interact with a tool by passing key-value properties with `god tool <SERVER> <TOOL> [optional parameters]`:
 
   ```sh
-  god tool <SERVER> <TOOL> key1=value1 key2=value2
+  god tool @modelcontextprotocol/server-everything add a=59 b=40
   ```
 
 For a complete list of commands and options, simply run:
@@ -97,20 +109,6 @@ For a complete list of commands and options, simply run:
 god --help
 ```
 
-## Configuration
-
-**mcpgod** manages server configurations by updating a client-specific JSON file:
-
-- **Windows:**
-  ```plaintext
-  %APPDATA%\Claude\claude_desktop_config.json
-  ```
-- **macOS/Linux:**
-  ```plaintext
-  ~/Library/Application Support/Claude/claude_desktop_config.json
-  ```
-
-Ensure your client configuration file exists or create it as needed.
 
 ## Logging
 
@@ -120,7 +118,7 @@ When running a server, **mcpgod** logs output to:
 ~/mcpgod/logs
 ```
 
-Each log file is timestamped to help you trace and debug any issues that arise.
+Each log file is organized by server name and timestamped to help you trace and debug any issues that arise.
 
 ## Development
 
@@ -137,7 +135,7 @@ npm install
 Run the CLI in development mode:
 
 ```sh
-npm run dev -- <command>
+./bin/dev
 ```
 
 ## Contributing
