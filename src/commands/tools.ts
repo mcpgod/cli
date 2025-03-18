@@ -23,18 +23,21 @@ export default class Tools extends Command {
     // Assert that argv is a string array.
     const stringArgs = argv as string[]
 
+    const isNodePackage = stringArgs[0].startsWith('@');
+    const command = isNodePackage ? (process.platform === 'win32' ? 'cmd' : 'npx') : 'uvx';
+    const args = isNodePackage ? (process.platform === 'win32' ? [
+      "/c",
+      "npx",
+      "-y",
+      ...stringArgs
+    ] : [
+      "-y",
+      ...stringArgs
+    ]) : stringArgs;
+
     const transport = new StdioClientTransport({
-      //command: process.platform === "win32" ? "npx.cmd" : "npx",
-      command: process.platform === "win32" ? "cmd" : "npx",
-      args: process.platform === "win32" ? [
-        "/c",
-        "npx",
-        "-y",
-        ...stringArgs
-      ] : [
-        "-y",
-        ...stringArgs
-      ]
+      command,
+      args
     });
 
     const client = new Client(
