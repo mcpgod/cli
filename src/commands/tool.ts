@@ -1,4 +1,4 @@
-import { Command, Args } from '@oclif/core'
+import { Command, Args, Flags } from '@oclif/core'
 import { Client } from "@modelcontextprotocol/sdk/client/index.js"
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js"
 
@@ -11,7 +11,9 @@ interface ToolArgs {
 
 export default class Tool extends Command {
   static description = 'Call a tool on a server'
-  static flags = {} // No flags
+  static flags = {
+    json: Flags.boolean({ char: 'j', description: 'Output result in JSON format' })
+  }
 
   // Use array syntax for positional args.
   // Oclif will use the 'name' field to build an object in the parsed output.
@@ -25,7 +27,7 @@ export default class Tool extends Command {
 
   async run() {
     // Parse using our ToolArgs interface.
-    const { argv } = await this.parse(Tool)
+    const { argv, flags } = await this.parse(Tool)
     const [server, tool, ...properties] = argv as string[];
 
     // console.log('server', server)
@@ -77,7 +79,11 @@ export default class Tool extends Command {
       arguments: propsObject,
     })
 
-    console.log('Tool call result:', result)
+    if (flags.json) {
+      console.log(JSON.stringify(result, null, 2) + '\n')
+    } else {
+      console.log('Tool call result:', result)
+    }
     process.exit(0)
   }
 }
