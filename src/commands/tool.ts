@@ -53,18 +53,21 @@ export default class Tool extends Command {
     
     //console.log(propsObject);
 
+    const isNodePackage = server.startsWith('@');
+    const command = isNodePackage ? (process.platform === "win32" ? "cmd" : "npx") : "uvx";
+    const args = isNodePackage ? (process.platform === "win32" ? [
+      "/c",
+      "npx",
+      "-y",
+      server
+    ] : [
+      "-y",
+      server
+    ]) : [server];
+
     const transport = new StdioClientTransport({
-      //command: process.platform === "win32" ? "npx.cmd" : "npx",
-      command: process.platform === "win32" ? "cmd" : "npx",
-      args: process.platform === "win32" ? [
-        "/c",
-        "npx",
-        "-y",
-        server
-      ] : [
-        "-y",
-        server
-      ]
+      command,
+      args
     });
 
     const client = new Client(
