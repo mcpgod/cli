@@ -130,6 +130,15 @@ export default class Run extends Command {
       shell: shell
     }) as ChildProcessWithoutNullStreams
 
+    child.on('error', (err: NodeJS.ErrnoException) => {
+      logger.error(`Failed to spawn ${childCommand}: ${err.message}`)
+      if (err.code === 'ENOENT') {
+        this.error(`${childCommand} not found. Please install it and try again.`)
+      } else {
+        this.error(`Failed to spawn ${childCommand}: ${err.message}`)
+      }
+    })
+
     child.stdout.on('data', (data: Buffer) => {
       handleOutput(data.toString(), process.stdout)
     })

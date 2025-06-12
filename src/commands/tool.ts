@@ -66,7 +66,15 @@ export default class Tool extends Command {
       { capabilities: { prompts: {}, resources: {}, tools: {} } }
     )
 
-    await client.connect(transport)
+    try {
+      await client.connect(transport)
+    } catch (err) {
+      const code = (err as NodeJS.ErrnoException).code
+      if (code === 'ENOENT') {
+        this.error(`${command} not found. Please install it and try again.`)
+      }
+      throw err
+    }
 
     const result = await client.callTool({
       name: tool,
