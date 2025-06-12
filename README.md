@@ -96,6 +96,7 @@ Access the CLI with the `god` command (or `npx -y mcpgod`). Below are some commo
   ```sh
   god tools @modelcontextprotocol/server-everything
   god tools ./mcp-server.py
+  god tools ./mcp-server-node.mjs
   ```
 
 - **Call a Specific Tool on a Server**
@@ -105,6 +106,7 @@ Access the CLI with the `god` command (or `npx -y mcpgod`). Below are some commo
   ```sh
   god tool @modelcontextprotocol/server-everything add a=59 b=40
   god tool ./mcp-server.py echo message=hi
+  god tool ./mcp-server-node.mjs echo message=hi
   ```
 
 For a complete list of commands and options, simply run:
