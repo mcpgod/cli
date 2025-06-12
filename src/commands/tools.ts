@@ -2,6 +2,7 @@ import {Command, Flags, Args} from '@oclif/core'
 import {stdout, colorize} from '@oclif/core/ux'
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
+import { computeChildProcess } from '../utils/spawn.js'
 
 export default class Tools extends Command {
   static description = 'List the tools for a server'
@@ -23,17 +24,7 @@ export default class Tools extends Command {
     // Assert that argv is a string array.
     const stringArgs = argv as string[]
 
-    const isNodePackage = stringArgs[0].startsWith('@');
-    const command = isNodePackage ? (process.platform === 'win32' ? 'cmd' : 'npx') : 'uvx';
-    const args = isNodePackage ? (process.platform === 'win32' ? [
-      "/c",
-      "npx",
-      "-y",
-      ...stringArgs
-    ] : [
-      "-y",
-      ...stringArgs
-    ]) : stringArgs;
+    const { childCommand: command, childArgs: args } = computeChildProcess(stringArgs)
 
     const transport = new StdioClientTransport({
       command,
