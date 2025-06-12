@@ -4,12 +4,14 @@ import * as path from 'path'
 import { spawn, ChildProcessWithoutNullStreams } from 'child_process'
 import stripAnsi from 'strip-ansi'
 import * as winston from 'winston'
+import { computeChildProcess } from '../utils/spawn.js'
 
 // Helper: remove non-printable control characters except newline (\n),
 // carriage return (\r), and tab (\t).
 function removeControlChars(input: string): string {
   return input.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '')
 }
+
 
 export default class Run extends Command {
   static description = 'Run a server'
@@ -114,13 +116,7 @@ export default class Run extends Command {
     }
 
     // Non-interactive mode using spawn.
-    let childCommand: string
-    if (process.platform === 'win32') {
-      childCommand = 'npx.cmd'
-    } else {
-      childCommand = 'npx'
-    }
-    const childArgs = ['-y', ...stringArgs]
+    const { childCommand, childArgs } = computeChildProcess(stringArgs)
     const shell = true; //process.stdout.isTTY ? true : false;
 
     logger.info(`Spawn: ${childCommand} ${childArgs.join(' ')}`)
@@ -134,6 +130,15 @@ export default class Run extends Command {
       shell: shell
     }) as ChildProcessWithoutNullStreams
 
+    child.on('error', (err: NodeJS.ErrnoException) => {
+      logger.error(`Failed to spawn ${childCommand}: ${err.message}`)
+      if (err.code === 'ENOENT') {
+        this.error(`${childCommand} not found. Please install it and try again.`)
+      } else {
+        this.error(`Failed to spawn ${childCommand}: ${err.message}`)
+      }
+    })
+
     child.stdout.on('data', (data: Buffer) => {
       handleOutput(data.toString(), process.stdout)
     })
@@ -145,7 +150,7 @@ export default class Run extends Command {
     return new Promise((resolve, reject) => {
       child.on('exit', (code: number) => {
         logger.info(`Process exited with code ${code} at ${new Date().toISOString()}`)
-        code === 0 ? resolve() : reject(new Error(`npx exited with code ${code}`))
+        code === 0 ? resolve() : reject(new Error(`${childCommand} exited with code ${code}`))
       })
     })
   }

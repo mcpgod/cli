@@ -1,6 +1,7 @@
 import { Command, Args, Flags } from '@oclif/core'
 import { Client } from "@modelcontextprotocol/sdk/client/index.js"
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js"
+import { computeChildProcess } from '../utils/spawn.js'
 
 // Define the expected shape for parsed arguments.
 interface ToolArgs {
@@ -53,17 +54,7 @@ export default class Tool extends Command {
     
     //console.log(propsObject);
 
-    const isNodePackage = server.startsWith('@');
-    const command = isNodePackage ? (process.platform === "win32" ? "cmd" : "npx") : "uvx";
-    const args = isNodePackage ? (process.platform === "win32" ? [
-      "/c",
-      "npx",
-      "-y",
-      server
-    ] : [
-      "-y",
-      server
-    ]) : [server];
+    const { childCommand: command, childArgs: args } = computeChildProcess([server])
 
     const transport = new StdioClientTransport({
       command,
@@ -75,7 +66,15 @@ export default class Tool extends Command {
       { capabilities: { prompts: {}, resources: {}, tools: {} } }
     )
 
-    await client.connect(transport)
+    try {
+      await client.connect(transport)
+    } catch (err) {
+      const code = (err as NodeJS.ErrnoException).code
+      if (code === 'ENOENT') {
+        this.error(`${command} not found. Please install it and try again.`)
+      }
+      throw err
+    }
 
     const result = await client.callTool({
       name: tool,

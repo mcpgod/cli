@@ -2,6 +2,7 @@ import {Command, Flags, Args} from '@oclif/core'
 import {stdout, colorize} from '@oclif/core/ux'
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
+import { computeChildProcess } from '../utils/spawn.js'
 
 export default class Tools extends Command {
   static description = 'List the tools for a server'
@@ -23,17 +24,7 @@ export default class Tools extends Command {
     // Assert that argv is a string array.
     const stringArgs = argv as string[]
 
-    const isNodePackage = stringArgs[0].startsWith('@');
-    const command = isNodePackage ? (process.platform === 'win32' ? 'cmd' : 'npx') : 'uvx';
-    const args = isNodePackage ? (process.platform === 'win32' ? [
-      "/c",
-      "npx",
-      "-y",
-      ...stringArgs
-    ] : [
-      "-y",
-      ...stringArgs
-    ]) : stringArgs;
+    const { childCommand: command, childArgs: args } = computeChildProcess(stringArgs)
 
     const transport = new StdioClientTransport({
       command,
@@ -54,7 +45,15 @@ export default class Tools extends Command {
       }
     );
 
-    await client.connect(transport);
+    try {
+      await client.connect(transport);
+    } catch (err) {
+      const code = (err as NodeJS.ErrnoException).code;
+      if (code === 'ENOENT') {
+        this.error(`${command} not found. Please install it and try again.`);
+      }
+      throw err;
+    }
 
     const res = await client.listTools();
 
