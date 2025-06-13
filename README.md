@@ -5,6 +5,7 @@
 [![Version](https://img.shields.io/npm/v/mcpgod.svg)](https://npmjs.org/package/mcpgod)
 [![Downloads/week](https://img.shields.io/npm/dw/mcpgod.svg)](https://npmjs.org/package/mcpgod)
 [![License](https://img.shields.io/npm/l/mcpgod.svg)](LICENSE)
+[![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen.svg)](coverage/lcov-report/index.html)
 
 ## Overview
 
