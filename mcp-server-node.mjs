@@ -5,7 +5,7 @@ import { z } from 'zod'
 const server = new McpServer({ name: 'EchoNode', version: '1.0.0' })
 
 server.tool('echo', { message: z.string() }, async ({ message }) => ({
-  content: [{ type: 'text', text: message }]
+  content: [{ text: message, type: 'text' }]
 }))
 
 const transport = new StdioServerTransport()

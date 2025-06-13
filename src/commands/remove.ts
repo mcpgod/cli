@@ -1,22 +1,20 @@
-import {Command, Flags, Args} from '@oclif/core'
-import * as fs from 'fs'
-import * as path from 'path'
+import {Args, Command, Flags} from '@oclif/core'
+import * as fs from 'node:fs'
+import path from 'node:path'
 
 export default class Remove extends Command {
-  static description = 'Remove a server from a client'
-
-  static flags = {
-    client: Flags.string({char: 'c', description: 'client name', required: true}),
-  }
-
   static args = {
     mcpServer: Args.string({description: 'MCP server to remove', required: true}),
+  }
+static description = 'Remove a server from a client'
+static flags = {
+    client: Flags.string({char: 'c', description: 'client name', required: true}),
   }
   
   async run() {
     const {args, flags} = await this.parse(Remove)
-    const mcpServer = args.mcpServer
-    const client = flags.client
+    const {mcpServer} = args
+    const {client} = flags
 
     // Determine the configuration file path based on the OS
     const configFilePath = process.platform === 'win32' 
@@ -26,7 +24,7 @@ export default class Remove extends Command {
     // Load the configuration file
     let config
     try {
-      const configFile = fs.readFileSync(configFilePath, 'utf-8')
+      const configFile = fs.readFileSync(configFilePath, 'utf8')
       config = JSON.parse(configFile)
     } catch (error: unknown) {
       if (error instanceof Error) {
@@ -34,6 +32,7 @@ export default class Remove extends Command {
       } else {
         this.error('Failed to read or parse configuration file')
       }
+
       return
     }
 

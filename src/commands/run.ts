@@ -1,15 +1,22 @@
 import { Command, Flags } from '@oclif/core'
-import * as fs from 'fs'
-import * as path from 'path'
-import { spawn, ChildProcessWithoutNullStreams } from 'child_process'
+import { ChildProcessWithoutNullStreams, spawn } from 'node:child_process'
+import * as fs from 'node:fs'
+import path from 'node:path'
 import stripAnsi from 'strip-ansi'
 import * as winston from 'winston'
+
 import { computeChildProcess } from '../utils/spawn.js'
 
 // Helper: remove non-printable control characters except newline (\n),
 // carriage return (\r), and tab (\t).
 function removeControlChars(input: string): string {
-  return input.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '')
+  // eslint-disable-next-line no-control-regex
+  return input.replaceAll(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, '')
+}
+
+function sanitizeFilename(str: string): string {
+  // Replace invalid characters with an underscore
+  return str.replaceAll(/[/?%*:|"<>\\]/g, '_')
 }
 
 
@@ -18,25 +25,25 @@ export default class Run extends Command {
   static examples = [
     `<%= config.bin %> <%= command.id %> @user/package-name -x conf.json`
   ]
-  static strict = false // Allow variable arguments
-
   static flags = {
     tools: Flags.string({
       char: 't',
-      description: 'Comma separated list of approved tools',
-      default: ''
+      default: '',
+      description: 'Comma separated list of approved tools'
     })
   };
+static strict = false // Allow variable arguments
 
   async run(): Promise<void> {
     const { argv, flags } = await this.parse(Run)
     if (argv.length === 0) {
       this.error('Please specify a package to run')
     }
+
     // Assert that argv is a string array.
     const stringArgs = argv as string[]
 
-    const approvedTools = flags.tools.split(',').map(tool => tool.trim());
+    const approvedTools = new Set(flags.tools.split(',').map(tool => tool.trim()));
 
     // Determine home directory for cross-platform compatibility.
     const homeDir = process.env.HOME || process.env.USERPROFILE;
@@ -50,25 +57,18 @@ export default class Run extends Command {
       fs.mkdirSync(logsDir, { recursive: true }); // Ensure nested directories are created.
     }
 
-    function sanitizeFilename(str: string): string {
-      // Replace invalid characters with an underscore
-      return str.replace(/[\/\\?%*:|"<>]/g, '_');
-    }
-
     // Create log file with timestamp.
-    const timestamp = new Date().toISOString().replace(/[:.]/g, '-')
+    const timestamp = new Date().toISOString().replaceAll(/[:.]/g, '-')
     const filename = sanitizeFilename(`run--${stringArgs.join(' ')}--${timestamp}.log`);
     const logFile = path.join(logsDir, filename)
 
     // Setup Winston logger.
     const logger = winston.createLogger({
-      level: 'info',
       format: winston.format.combine(
         winston.format.timestamp(),
-        winston.format.printf(({ timestamp, level, message }) => {
-          return `${timestamp} [${level.toUpperCase()}] ${message}`
-        })
+        winston.format.printf(({ level, message, timestamp }) => `${timestamp} [${level.toUpperCase()}] ${message}`)
       ),
+      level: 'info',
       transports: [new winston.transports.File({ filename: logFile })]
     })
 
@@ -78,11 +78,14 @@ export default class Run extends Command {
     logger.info('')
 
     // Filter process.env so that all values are strings.
-    const filteredEnv = Object.keys(process.env).reduce((env, key) => {
-      env[key] = process.env[key] || ''
-      return env
-    }, {} as { [key: string]: string })
-    filteredEnv.TERM = filteredEnv.TERM || 'xterm-color'
+    const filteredEnv: {[key: string]: string} = {}
+    for (const key of Object.keys(process.env)) {
+      filteredEnv[key] = process.env[key] || ''
+    }
+
+    if (!filteredEnv.TERM) {
+      filteredEnv.TERM = 'xterm-color'
+    }
 
     function handleOutput(data: string, stream: NodeJS.WritableStream) {
       try {
@@ -90,15 +93,16 @@ export default class Run extends Command {
         // Check if parsed JSON has the expected result.tools structure before filtering
         if (parsed && parsed.result && Array.isArray(parsed.result.tools)) {
           parsed.result.tools = parsed.result.tools.filter(
-            (tool: { name: string }) => approvedTools.includes(tool.name)
+            (tool: { name: string }) => approvedTools.has(tool.name)
           );
           const jsonString = JSON.stringify(parsed);
           // Apparently claude desktop expects a newline at the end.
           data = jsonString + "\n";
         }
-      } catch (error) {
+      } catch {
         // If JSON parsing fails, fall back to treating the data as plain text.
       }
+
       stream.write(data);
       const cleaned = removeControlChars(stripAnsi(data));
       logger.info(cleaned);
@@ -116,8 +120,8 @@ export default class Run extends Command {
     }
 
     // Non-interactive mode using spawn.
-    const { childCommand, childArgs } = computeChildProcess(stringArgs)
-    const shell = true; //process.stdout.isTTY ? true : false;
+    const { childArgs, childCommand } = computeChildProcess(stringArgs)
+    const shell = true; // process.stdout.isTTY ? true : false;
 
     logger.info(`Spawn: ${childCommand} ${childArgs.join(' ')}`)
     logger.info(`Shell: ${shell}`)
@@ -126,8 +130,8 @@ export default class Run extends Command {
     const child = spawn(childCommand, childArgs, {
       cwd: process.cwd(),
       env: filteredEnv,
-      stdio: ['pipe', 'pipe', 'pipe'],
-      shell: shell
+      shell,
+      stdio: ['pipe', 'pipe', 'pipe']
     }) as ChildProcessWithoutNullStreams
 
     child.on('error', (err: NodeJS.ErrnoException) => {
@@ -150,7 +154,11 @@ export default class Run extends Command {
     return new Promise((resolve, reject) => {
       child.on('exit', (code: number) => {
         logger.info(`Process exited with code ${code} at ${new Date().toISOString()}`)
-        code === 0 ? resolve() : reject(new Error(`${childCommand} exited with code ${code}`))
+        if (code === 0) {
+          resolve()
+        } else {
+          reject(new Error(`${childCommand} exited with code ${code}`))
+        }
       })
     })
   }

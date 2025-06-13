@@ -10,7 +10,9 @@
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.6.1",
     "@oclif/core": "^4",
-    "winston": "^3.17.0"
+    "winston": "^3.17.0",
+    "strip-ansi": "^7",
+    "zod": "^3"
   },
   "devDependencies": {
     "@eslint/compat": "^1",
