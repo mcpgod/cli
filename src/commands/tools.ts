@@ -97,5 +97,7 @@ static strict = false
     for (const tool of toolsArray) {
       printTool(tool)
     }
+
+    await client.close()
   }
 }
