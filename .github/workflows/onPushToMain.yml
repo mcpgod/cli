@@ -13,6 +13,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
+        with:
+          node-version: latest
       - name: Check if version already exists
         id: version-check
         run: |
@@ -56,3 +58,20 @@ jobs:
           commit: ${{ github.ref_name }}
           token: ${{ secrets.GITHUB_TOKEN }}
           skipIfReleaseExists: true
+      - name: Install dependencies
+        if: ${{ steps.version-check.outputs.skipped == 'false' }}
+        run: npm install
+      - name: Build
+        if: ${{ steps.version-check.outputs.skipped == 'false' }}
+        run: npm run build
+      - name: Prepare package
+        if: ${{ steps.version-check.outputs.skipped == 'false' }}
+        run: npm run prepack
+      - name: Publish to npm
+        uses: JS-DevTools/npm-publish@19c28f1ef146469e409470805ea4279d47c3d35c
+        if: ${{ steps.version-check.outputs.skipped == 'false' }}
+        with:
+          token: ${{ secrets.NPM_TOKEN }}
+      - name: Cleanup package
+        if: ${{ steps.version-check.outputs.skipped == 'false' }}
+        run: npm run postpack
