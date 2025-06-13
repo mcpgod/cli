@@ -145,6 +145,17 @@ Run the CLI in development mode:
 ./bin/dev
 ```
 
+## Publishing
+
+Automatic publishing is handled by the `version, tag and github release` workflow. A new npm version is published whenever a version bump is merged into the `main` branch. The workflow can also be triggered manually from the **Actions** tab.
+
+To enable publishing, set the following repository secrets:
+
+- `NPM_TOKEN` – authentication token for npm.
+- `GH_EMAIL` and `GH_USERNAME` – used by the README update step.
+
+Once the secrets are configured, pushing a new version or running the workflow manually will build the project, create a GitHub release and publish the package to npm.
+
 ## Contributing
 
 Contributions are always welcome! To contribute:
