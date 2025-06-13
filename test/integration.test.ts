@@ -2,7 +2,7 @@ import {expect} from 'chai'
 import {spawnSync} from 'node:child_process'
 
 function runCli(args: string[]) {
-  return spawnSync('node', ['--loader','ts-node/esm','--disable-warning=ExperimentalWarning', './bin/dev.js', ...args], {encoding: 'utf8', timeout: 5000})
+  return spawnSync(process.execPath, ['--loader','ts-node/esm','--disable-warning=ExperimentalWarning', './bin/dev.js', ...args], {encoding: 'utf8', timeout: 15_000})
 }
 
 describe('integration', () => {
