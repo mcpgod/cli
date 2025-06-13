@@ -18,20 +18,23 @@ jobs:
           node-version: latest
       - name: Check if version already exists
         id: version-check
+        shell: bash
         run: |
-          package_name=$(node -p "require('./package.json').name")
-          package_version=$(node -p "require('./package.json').version")
-          gh_exists=$(gh api repos/${{ github.repository }}/releases/tags/v$package_version >/dev/null 2>&1 && echo "true" || echo "")
-          npm_exists=$(npm view "$package_name@$package_version" --json >/dev/null 2>&1 && echo "true" || echo "")
+          package_name="$(node -p "require('./package.json').name")"
+          package_version="$(node -p "require('./package.json').version")"
 
-          if [ -n "$gh_exists" ] || [ -n "$npm_exists" ]; then
-            echo "Version v$package_version already exists"
-            echo "::warning file=package.json,line=1::Version v$package_version already exists - no release will be created. If you want to create a new release, please update the version in package.json and push again."
-            echo "skipped=true" >> $GITHUB_OUTPUT
+          gh_exists="$(gh api \
+              "repos/${{ github.repository }}/releases/tags/v${package_version}" \
+              >/dev/null 2>&1 && echo 'true' || echo '')"
+
+          npm_exists="$(npm view "${package_name}@${package_version}" --json \
+              >/dev/null 2>&1 && echo 'true' || echo '')"
+
+          if [[ -n "$gh_exists" || -n "$npm_exists" ]]; then
+            echo "::warning file=package.json,line=1::Version v${package_version} already exists—skipping release."
+            echo "skipped=true"  >>"${GITHUB_OUTPUT}"
           else
-            echo "Version v$package_version does not exist. Creating release..."
-            echo "skipped=false" >> $GITHUB_OUTPUT
-            echo "tag=v$package_version" >> $GITHUB_OUTPUT
+            echo "skipped=false" >>"${GITHUB_OUTPUT}"
           fi
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
