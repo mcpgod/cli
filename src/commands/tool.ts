@@ -7,13 +7,16 @@ import { computeChildProcess } from '../utils/spawn.js'
 // Define the expected shape for parsed arguments.
 
 export default class Tool extends Command {
-  // Use array syntax for positional args.
-  // Oclif will use the 'name' field to build an object in the parsed output.
+  // Arguments must be declared in the order they are expected on the
+  // command line. Required arguments cannot come after optional ones,
+  // otherwise oclif will throw an "Invalid argument spec" error.
+  /* eslint-disable perfectionist/sort-objects */
   static args = {
-    properties: Args.string({ description: 'Tool properties as key=value pairs', multiple: true }),
     server: Args.string({ description: 'the MCP server', required: true }),
-    tool: Args.string({ description: 'the tool to call', required: true })
+    tool: Args.string({ description: 'the tool to call', required: true }),
+    properties: Args.string({ description: 'Tool properties as key=value pairs', multiple: true }),
   }
+  /* eslint-enable perfectionist/sort-objects */
   static description = 'Call a tool on a server'
 static flags = {
     json: Flags.boolean({ char: 'j', description: 'Output result in JSON format' })
@@ -81,6 +84,8 @@ static strict = false
     } else {
       console.log('Tool call result:', result)
     }
+
+    await client.close()
 
   }
 }
