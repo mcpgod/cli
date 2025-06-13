@@ -1,0 +1,21 @@
+name: actionlint
+
+on:
+  # run only when workflow files change
+  pull_request:
+    paths: ['.github/workflows/**']
+  push:
+    branches: [main]
+    paths:   ['.github/workflows/**']
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # installs the actionlint binary and scans .github/workflows
+      - name: Lint GitHub Actions
+        uses: eifinger/actionlint-action@v1
+        # with:
+        #   version: "v1.7.7"   # ⇐ uncomment to pin an exact linter version
