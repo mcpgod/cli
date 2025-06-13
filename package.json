@@ -4,7 +4,7 @@
   "version": "0.0.3",
   "author": "Gavin Uhma",
   "bin": {
-    "god": "./bin/run.js"
+    "mcpgod": "./bin/run.js"
   },
   "bugs": "https://github.com/mcpgod/cli/issues",
   "dependencies": {
@@ -48,8 +48,8 @@
   "main": "dist/index.js",
   "type": "module",
   "oclif": {
-    "bin": "god",
-    "dirname": "god",
+    "bin": "mcpgod",
+    "dirname": "mcpgod",
     "commands": "./dist/commands"
   },
   "repository": "mcpgod/cli",
