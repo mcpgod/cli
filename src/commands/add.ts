@@ -1,28 +1,26 @@
-import {Command, Flags, Args} from '@oclif/core'
-import * as fs from 'fs'
-import * as path from 'path'
+import {Args, Command, Flags} from '@oclif/core'
+import * as fs from 'node:fs'
+import path from 'node:path'
 
 export default class Add extends Command {
-  static description = 'Add a server to a client'
-
-  static flags = {
+  static args = {
+    server: Args.string({description: 'The mcp server to add', required: true}),
+  }
+static description = 'Add a server to a client'
+static flags = {
     client: Flags.string({char: 'c', description: 'Client name to add the server to', required: true}),
     tools: Flags.string({
       char: 't',
       description: 'Comma separated list of approved tools'
     })
   }
-
-  static args = {
-    server: Args.string({description: 'The mcp server to add', required: true}),
-  }
   
   async run() {
     const {args, flags} = await this.parse(Add)
-    const server = args.server
-    const client = flags.client
+    const {server} = args
+    const {client} = flags
 
-    var approvedTools = '';
+    let approvedTools = '';
 
     if (flags.tools) {
       approvedTools += '--tools ' + flags.tools
@@ -36,7 +34,7 @@ export default class Add extends Command {
     // Load the configuration file
     let config
     try {
-      const configFile = fs.readFileSync(configFilePath, 'utf-8')
+      const configFile = fs.readFileSync(configFilePath, 'utf8')
       config = JSON.parse(configFile)
     } catch (error: unknown) {
       if (error instanceof Error) {
@@ -44,6 +42,7 @@ export default class Add extends Command {
       } else {
         this.error('Failed to read or parse configuration file')
       }
+
       return
     }
 
@@ -55,14 +54,14 @@ export default class Add extends Command {
 
     // Add the new mcp-server
     config.mcpServers[server] = {
-      command: 'npx',
       args: [
         "-y",
         "mcpgod",
         "run",
         server,
         approvedTools
-      ]
+      ],
+      command: 'npx'
     }
 
     // Write the updated configuration back to the file

@@ -1,11 +1,11 @@
-import {Command, Flags, Args} from '@oclif/core'
-import * as fs from 'fs'
-import * as path from 'path'
-import {stdout, colorize} from '@oclif/core/ux'
+import {Command, Flags} from '@oclif/core'
+import {colorize, stdout} from '@oclif/core/ux'
+import * as fs from 'node:fs'
+import path from 'node:path'
 
 interface ServerDetails {
-  command: string;
   args: string[];
+  command: string;
 }
 
 interface Config {
@@ -14,36 +14,38 @@ interface Config {
 
 export default class List extends Command {
   static description = 'List all the servers for a client'
-
-  static flags = {
+static flags = {
     client: Flags.string({char: 'c', description: 'client name', required: true}),
   }
 
   async run() {
     const {flags} = await this.parse(List)
-    const client = flags.client
+    const {client} = flags
 
     // Determine the configuration file path based on the OS
     const configFilePath = (() => {
       switch (client) {
-        case 'claude':
+        case 'claude': {
           return process.platform === 'win32' 
             ? path.join(process.env.APPDATA || '', 'Claude', 'claude_desktop_config.json')
             : path.join(process.env.HOME || '', 'Library', 'Application Support', 'Claude', 'claude_desktop_config.json');
-        default:
+        }
+
+        default: {
           this.log(`Unknown client ${client}`);
           return '';
+        }
       }
     })();
 
-    if (configFilePath == '') {
+    if (configFilePath === '') {
       return
     }
 
     // Load the configuration file
     let config: Config
     try {
-      const configFile = fs.readFileSync(configFilePath, 'utf-8')
+      const configFile = fs.readFileSync(configFilePath, 'utf8')
       config = JSON.parse(configFile)
     } catch (error: unknown) {
       if (error instanceof Error) {
@@ -51,6 +53,7 @@ export default class List extends Command {
       } else {
         this.error('Failed to read or parse configuration file')
       }
+
       return
     }
 

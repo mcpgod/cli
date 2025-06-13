@@ -6,11 +6,11 @@ export default class Clients extends Command {
   async run() {
     const supportedClients = [
       'claude',
-      //'cursor'
+      // 'cursor'
     ]
 
-    supportedClients.forEach(client => {
+    for (const client of supportedClients) {
       this.log(`${client}`)
-    })
+    }
   }
 }
