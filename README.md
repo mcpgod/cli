@@ -34,7 +34,7 @@ npm install -g mcpgod
 Verify the installation:
 
 ```sh
-god --version
+mcpgod --version
 ```
 
 Or run directly with `npx`.
@@ -45,74 +45,74 @@ npx -y mcpgod
 
 ## Usage
 
-Access the CLI with the `god` command (or `npx -y mcpgod`). Below are some common examples:
+Access the CLI with the `mcpgod` command (or `npx -y mcpgod`). Below are some common examples:
 
 - **Add a Server to a Client**
 
-  Add an MCP server to a client (e.g., Claude) with `god add <SERVER> -c <CLIENT>`:
+  Add an MCP server to a client (e.g., Claude) with `mcpgod add <SERVER> -c <CLIENT>`:
 
   ```sh
-  god add @modelcontextprotocol/server-everything -c claude
+  mcpgod add @modelcontextprotocol/server-everything -c claude
   ```
 
 - **Only Add Specific Tools to a Client**
 
-  Only add specific tools to a client with `god add <SERVER> -c <CLIENT> --tools=<COMMA_DELIMITED_LIST>`:
+  Only add specific tools to a client with `mcpgod add <SERVER> -c <CLIENT> --tools=<COMMA_DELIMITED_LIST>`:
 
   ```sh
-  god add @modelcontextprotocol/server-everything -c claude --tools=echo,add
+  mcpgod add @modelcontextprotocol/server-everything -c claude --tools=echo,add
   ```
 
 - **List Servers for a Client**
 
-  List all configured servers for a specific client with `god list -c <CLIENT>`:
+  List all configured servers for a specific client with `mcpgod list -c <CLIENT>`:
 
   ```sh
-  god list -c claude
+  mcpgod list -c claude
   ```
 
 - **Remove a Server**
 
-  Remove an MCP server from your client's configuration with `god remove <SERVER> -c <CLIENT>`:
+  Remove an MCP server from your client's configuration with `mcpgod remove <SERVER> -c <CLIENT>`:
 
   ```sh
-  god remove @modelcontextprotocol/server-everything -c claude
+  mcpgod remove @modelcontextprotocol/server-everything -c claude
   ```
 
 - **Run a Server**
 
-  Run a server process with detailed logging with `god run <SERVER>`:
+  Run a server process with detailed logging with `mcpgod run <SERVER>`:
 
   ```sh
-  god run @modelcontextprotocol/server-everything
-  god run ./mcp-server.py
-  god run ./mcp-server-node.mjs
+  mcpgod run @modelcontextprotocol/server-everything
+  mcpgod run ./mcp-server.py
+  mcpgod run ./mcp-server-node.mjs
   ```
 
 - **List Available Tools for a Server**
 
-  Display the list of tools available on a server with `god tools <SERVER>`:
+  Display the list of tools available on a server with `mcpgod tools <SERVER>`:
 
   ```sh
-  god tools @modelcontextprotocol/server-everything
-  god tools ./mcp-server.py
-  god tools ./mcp-server-node.mjs
+  mcpgod tools @modelcontextprotocol/server-everything
+  mcpgod tools ./mcp-server.py
+  mcpgod tools ./mcp-server-node.mjs
   ```
 
 - **Call a Specific Tool on a Server**
 
-  Interact with a tool by passing key-value properties with `god tool <SERVER> <TOOL> [optional parameters]`:
+  Interact with a tool by passing key-value properties with `mcpgod tool <SERVER> <TOOL> [optional parameters]`:
 
   ```sh
-  god tool @modelcontextprotocol/server-everything add a=59 b=40
-  god tool ./mcp-server.py echo message=hi
-  god tool ./mcp-server-node.mjs echo message=hi
+  mcpgod tool @modelcontextprotocol/server-everything add a=59 b=40
+  mcpgod tool ./mcp-server.py echo message=hi
+  mcpgod tool ./mcp-server-node.mjs echo message=hi
   ```
 
 For a complete list of commands and options, simply run:
 
 ```sh
-god --help
+mcpgod --help
 ```
 
 
