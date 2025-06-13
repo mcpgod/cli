@@ -30,7 +30,8 @@
     "oclif": "^4",
     "shx": "^0.3.3",
     "ts-node": "^10",
-    "typescript": "^5"
+    "typescript": "^5",
+    "node-actionlint": "^1.2.2"
   },
   "engines": {
     "node": ">=18.0.0"
@@ -62,7 +63,8 @@
     "prepack": "oclif manifest && oclif readme",
     "test": "mocha --forbid-only \"test/**/*.test.ts\"",
     "coverage": "c8 --reporter=lcov --reporter=text npm test",
-    "version": "oclif readme && git add README.md"
+    "version": "oclif readme && git add README.md",
+    "lint:workflows": "node-actionlint '.github/workflows/**/*.yml'"
   },
   "types": "dist/index.d.ts"
 }

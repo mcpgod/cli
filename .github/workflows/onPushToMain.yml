@@ -4,6 +4,7 @@ name: version, tag and github release
 on:
   push:
     branches: [main]
+  workflow_dispatch:
 
 jobs:
   release:
@@ -13,21 +14,27 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
+        with:
+          node-version: latest
       - name: Check if version already exists
         id: version-check
+        shell: bash
         run: |
-          package_version=$(node -p "require('./package.json').version")
-          exists=$(gh api repos/${{ github.repository }}/releases/tags/v$package_version >/dev/null 2>&1 && echo "true" || echo "")
+          package_name="$(node -p "require('./package.json').name")"
+          package_version="$(node -p "require('./package.json').version")"
 
-          if [ -n "$exists" ];
-          then
-            echo "Version v$package_version already exists"
-            echo "::warning file=package.json,line=1::Version v$package_version already exists - no release will be created. If you want to create a new release, please update the version in package.json and push again."
-            echo "skipped=true" >> $GITHUB_OUTPUT
+          gh_exists="$(gh api \
+              "repos/${{ github.repository }}/releases/tags/v${package_version}" \
+              >/dev/null 2>&1 && echo 'true' || echo '')"
+
+          npm_exists="$(npm view "${package_name}@${package_version}" --json \
+              >/dev/null 2>&1 && echo 'true' || echo '')"
+
+          if [[ -n "$gh_exists" || -n "$npm_exists" ]]; then
+            echo "::warning file=package.json,line=1::Version v${package_version} already exists—skipping release."
+            echo "skipped=true"  >>"${GITHUB_OUTPUT}"
           else
-            echo "Version v$package_version does not exist. Creating release..."
-            echo "skipped=false" >> $GITHUB_OUTPUT
-            echo "tag=v$package_version" >> $GITHUB_OUTPUT
+            echo "skipped=false" >>"${GITHUB_OUTPUT}"
           fi
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -56,3 +63,20 @@ jobs:
           commit: ${{ github.ref_name }}
           token: ${{ secrets.GITHUB_TOKEN }}
           skipIfReleaseExists: true
+      - name: Install dependencies
+        if: ${{ steps.version-check.outputs.skipped == 'false' }}
+        run: npm install
+      - name: Build
+        if: ${{ steps.version-check.outputs.skipped == 'false' }}
+        run: npm run build
+      - name: Prepare package
+        if: ${{ steps.version-check.outputs.skipped == 'false' }}
+        run: npm run prepack
+      - name: Publish to npm
+        uses: JS-DevTools/npm-publish@19c28f1ef146469e409470805ea4279d47c3d35c
+        if: ${{ steps.version-check.outputs.skipped == 'false' }}
+        with:
+          token: ${{ secrets.NPM_TOKEN }}
+      - name: Cleanup package
+        if: ${{ steps.version-check.outputs.skipped == 'false' }}
+        run: npm run postpack
