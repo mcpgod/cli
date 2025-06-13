@@ -1,7 +1,7 @@
 {
   "name": "mcpgod",
   "description": "add, remove, run, and inspect mcp servers",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "author": "Gavin Uhma",
   "bin": {
     "mcpgod": "./bin/run.js"
