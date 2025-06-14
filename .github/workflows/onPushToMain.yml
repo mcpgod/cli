@@ -23,6 +23,8 @@ jobs:
           package_name="$(node -p "require('./package.json').name")"
           package_version="$(node -p "require('./package.json').version")"
 
+          echo "tag=v${package_version}" >>"${GITHUB_OUTPUT}"
+
           gh_exists="$(gh api \
               "repos/${{ github.repository }}/releases/tags/v${package_version}" \
               >/dev/null 2>&1 && echo 'true' || echo '')"
